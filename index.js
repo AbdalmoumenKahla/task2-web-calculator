@@ -1,21 +1,20 @@
 function calculateExpression(expression) {
-  let expr = expression.split(" ");
-  
-  for (let i = 0; i < expr.length; i++) {
-    if (!isNaN(expr[i])) {
-      expr[i] = parseFloat(expr[i]);
-    }
-  }
+
+  const tokens = expression.split(" ").filter(token => token !== '');
   
   let values = [];
   let ops = [];
   
-  for (let i = 0; i < expr.length; i++) {
-    if (typeof expr[i] === 'number') {
-      values.push(expr[i]);
-    } else if (expr[i] === "(") {
-      ops.push(expr[i]);
-    } else if (expr[i] === ")") {
+ 
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    const num = Number(token);
+
+    if (!isNaN(num)) {
+      values.push(num);
+    } else if (token === "(") {
+      ops.push(token);
+    } else if (token === ")") {
       while (ops.length && ops[ops.length - 1] !== "(") {
         let val2 = values.pop();
         let val1 = values.pop();
@@ -23,14 +22,14 @@ function calculateExpression(expression) {
         values.push(applyOp(val1, val2, op));
       }
       ops.pop(); 
-    } else if (["+", "-", "*", "/"].includes(expr[i])) {
-      while (ops.length && precedence(ops[ops.length - 1]) >= precedence(expr[i])) {
+    } else if (["+", "-", "*", "/"].includes(token)) {
+      while (ops.length && precedence(ops[ops.length - 1]) >= precedence(token)) {
         let val2 = values.pop();
         let val1 = values.pop();
         let op = ops.pop();
         values.push(applyOp(val1, val2, op));
       }
-      ops.push(expr[i]); 
+      ops.push(token); 
     }
   }
   
@@ -68,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
     button.addEventListener('click', function() {
       const value = this.innerText;
       if (value === '=') {
-        console.log(eval(textbox.value));
         textbox.value = calculateExpression(textbox.value);
       }
       else if (value === 'C') {
